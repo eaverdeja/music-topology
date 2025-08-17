@@ -20,7 +20,7 @@ Diatonic scale degrees are treated as integers `1-7` wrapped modulo 7. This turn
 
 ### 2.2 Chord & ShellChord
 
-*Chord* is the generic concept: an ordered set of pitches derived from a symbol plus an optional inversion number.
+_Chord_ is the generic concept: an ordered set of pitches derived from a symbol plus an optional inversion number.
 
 A **Chord** is an ordered set of pitches obtained from a symbol plus an optional inversion.
 
@@ -33,17 +33,21 @@ Shell voicings depend **only on the chord symbol itself**, not on the surroundin
 Conversion from absolute notes to diatonic scale-degrees is deferred until a **key context** is supplied for voice-leading calculations.
 
 ### 2.3 Voice-Leading Vector (VL)
-With a key context we first map every note to its diatonic **degree** (`1-7`).  For two voiced chords *A → B* aligned as `(a₀,a₁,a₂)` → `(b₀,b₁,b₂)`:
-1. *Raw clockwise distance*  `rawᵢ = (bᵢ − aᵢ + 7) mod 7` → range 0-6.
-2. *Shortest signed step*    `vlᵢ = rawᵢ ≤ 3 ? rawᵢ : rawᵢ − 7` → range -3…+3.
+
+With a key context we first map every note to its diatonic **degree** (`1-7`). For two voiced chords _A → B_ aligned as `(a₀,a₁,a₂)` → `(b₀,b₁,b₂)`:
+
+1. _Raw clockwise distance_ `rawᵢ = (bᵢ − aᵢ + 7) mod 7` → range 0-6.
+2. _Shortest signed step_ `vlᵢ = rawᵢ ≤ 3 ? rawᵢ : rawᵢ − 7` → range -3…+3.
 3. Collect the tuple **VL = `[vl₀, vl₁, vl₂]`**.
 
 Properties
-* `|vlᵢ| ≤ 3` highlights tight motion.
-* Sign patterns show parallel (`+++`), contrary (`+−…`), oblique (`0…`).
-* Adding a constant `k` to *all* degrees of *both* chords (a **rotation**) leaves VL unchanged.
+
+- `|vlᵢ| ≤ 3` highlights tight motion.
+- Sign patterns show parallel (`+++`), contrary (`+−…`), oblique (`0…`).
+- Adding a constant `k` to _all_ degrees of _both_ chords (a **rotation**) leaves VL unchanged.
 
 **Illustrative examples in C major**
+
 ```
 // Parallel movement (all voices ↑ 3 degrees)
 Em7 root-pos : E-G-D  → degrees [3,5,2]
@@ -113,12 +117,12 @@ export type Degree = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export interface Chord {
   symbol: string;
-  inversion?: number;        // 0 = root, 1 = first inversion, …
-  notes: string[];           // ordered bass→top, length ≥ 3
+  inversion?: number; // 0 = root, 1 = first inversion, …
+  notes: string[]; // ordered bass→top, length ≥ 3
 }
 
 export interface ShellChord extends Chord {
-  inversion: 0 | 1 | 2;      // root, 3rd, or 7th in bass
+  inversion: 0 | 1 | 2; // root, 3rd, or 7th in bass
   notes: [string, string, string];
 }
 
@@ -129,9 +133,16 @@ export function makeShell(symbol: string, inversion?: 0 | 1 | 2): ShellChord;
 // Utilities (work with any Chord)
 export function chordToDegrees(chord: Chord, key: string): Degree[];
 export function voiceLeading(a: Chord, b: Chord, key: string): number[];
-export function rotateProgression(chords: Chord[], k: Degree, key: string): Chord[];
-export function allInversionPairs(fromSym: string, toSym: string, key: string):
-  Array<{ from: Chord; to: Chord; vl: number[] }>;
+export function rotateProgression(
+  chords: Chord[],
+  k: Degree,
+  key: string
+): Chord[];
+export function allInversionPairs(
+  fromSym: string,
+  toSym: string,
+  key: string
+): Array<{ from: Chord; to: Chord; vl: number[] }>;
 ```
 
 ---
@@ -154,13 +165,13 @@ export function allInversionPairs(fromSym: string, toSym: string, key: string):
 - Add playback (tone.js) to hear chosen voicing vs rotation.
 - Machine-learned “interestingness” score from voice-leading corpus.
 - **Rendering enhancements**
-  * Render chord progression on traditional staff notation (SVG).
-  * Render on a configurable **stringed-instrument neck**:
-    * User sets number of strings and their tunings.
-    * Supports guitar, mandolin, cavaquinho, etc.
+  - Render chord progression on traditional staff notation (SVG).
+  - Render on a configurable **stringed-instrument neck**:
+    - User sets number of strings and their tunings.
+    - Supports guitar, mandolin, cavaquinho, etc.
 - **Tymoczko voice-leading space & metrics**
-  * Switchable **taxicab norm** (sum of semitone motions) alongside diatonic-step VL.
-  * 3-D orbifold visualisation of chord paths (three.js/WebGL).
-  * "Nearest-neighbors" panel to suggest small-distance reharmonisations.
-  * Geodesic path finder between two chords.
-  * Optional educational overlay with hexatonic/region labels based on Tymoczko terminology.
+  - Switchable **taxicab norm** (sum of semitone motions) alongside diatonic-step VL.
+  - 3-D orbifold visualisation of chord paths (three.js/WebGL).
+  - "Nearest-neighbors" panel to suggest small-distance reharmonisations.
+  - Geodesic path finder between two chords.
+  - Optional educational overlay with hexatonic/region labels based on Tymoczko terminology.
